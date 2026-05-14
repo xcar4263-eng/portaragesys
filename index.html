@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title> خدمات بورتراج</title>
+  <title>اسعار خدمات بورتراج</title>
   <script src="/_sdk/element_sdk.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
@@ -469,38 +469,38 @@
     .modal-overlay.hidden { display: none; }
 
     .modal {
-      background: #0f0f0f;
-      border: 1px solid #333;
-      border-radius: 8px;
-      padding: 16px;
+      background: rgba(16, 16, 16, 0.98);
+      border: 1px solid #444;
+      border-radius: 12px;
+      padding: 20px;
       width: min(520px, 100%);
       position: relative;
-      box-shadow: 0 14px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(242,188,27,0.1);
+      box-shadow: 0 18px 45px rgba(0,0,0,0.5), 0 0 0 1px rgba(242,188,27,0.08);
     }
 
     .modal h3 {
-      margin: 0 0 10px 0;
+      margin: 0 0 14px 0;
       color: #F2BC1B;
-      font-size: 16px;
+      font-size: 18px;
       font-weight: 800;
     }
 
     .modal .modal-actions {
       display: flex;
-      gap: 8px;
+      gap: 10px;
       justify-content: flex-start;
-      margin-top: 12px;
+      margin-top: 18px;
       flex-wrap: wrap;
     }
 
     .modal .modal-actions .btn-primary { min-width: 140px; }
 
     .modal .modal-actions .btn-secondary {
-      background: #2a2a2a;
+      background: #222;
       color: #fff;
-      border: 1px solid #444;
-      padding: 10px 14px;
-      border-radius: 6px;
+      border: 1px solid #555;
+      padding: 10px 16px;
+      border-radius: 8px;
       cursor: pointer;
       transition: all 0.2s ease;
     }
@@ -1197,23 +1197,25 @@
     }
 
     .oil-card {
-      background: #1a1a1a;
-      border: 1px solid #F2BC1B;
-      border-radius: 8px;
-      padding: 16px;
+      background: linear-gradient(180deg, #111111 0%, #0c0c0c 100%);
+      border: 1px solid rgba(242, 188, 27, 0.95);
+      border-radius: 12px;
+      padding: 18px;
       color: #fff;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
     }
 
     .oil-card-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
     }
 
     .oil-card-header h4 {
       margin: 0;
       color: #F2BC1B;
+      font-size: 1rem;
     }
 
     .oil-price {
@@ -1222,8 +1224,14 @@
       color: #4ade80;
     }
 
+    .oil-card-details {
+      border-top: 1px solid rgba(242, 188, 27, 0.15);
+      padding-top: 12px;
+      margin-top: 12px;
+    }
+
     .oil-card-details p {
-      margin: 4px 0;
+      margin: 6px 0;
       font-size: 14px;
       color: #ccc;
     }
@@ -12748,9 +12756,7 @@ ${wash.services.map(s => `• ${s}`).join('\n')}
       const resultsHtml = availableOils.length > 0 ? availableOils.map(oil => {
         const oilTotal = oil.effectivePriceLiter * car.liters;
         const grandTotal = oilTotal + oilFilter_filterPrice + oilFilter_servicePrice;
-        const message = `متوفر زيت ${oilFilter_translateBrand(oil.brand)} (${car.liters}) لتر ودرجة اللزوجة ${oil.type} مع الفلتر من الوكيل المعتمد مع فحص مجاني لمستوى غاز المكيف وإعادة برمجة علامة الخدمة جدام البيت بقيمة ${grandTotal.toFixed(2)} دك
-
-مناسب لسيارة: ${oilFilter_getArabicCarName(car.carModel)}`;
+        const message = `متوفر زيت ${oilFilter_translateBrand(oil.brand)} (${car.liters}) لتر ودرجة اللزوجة ${oil.type} مع الفلتر من الوكيل المعتمد مع فحص مجاني لمستوى غاز المكيف وإعادة برمجة علامة الخدمة جدام البيت بقيمة ${grandTotal.toFixed(2)} دك\n\nمناسب لسيارة: ${oilFilter_getArabicCarName(car.carModel)}`;
         return `
           <div class="oil-card">
             <div class="oil-card-header">
@@ -12763,7 +12769,7 @@ ${wash.services.map(s => `• ${s}`).join('\n')}
               <p>المتوفر: ${oil.contAvailable} لتر</p>
               <p>تفاصيل: زيت ${oilTotal.toFixed(2)} + فلتر ${oilFilter_filterPrice} + خدمة ${oilFilter_servicePrice}</p>
             </div>
-            <button class="btn-primary oil-copy-btn" onclick="oilFilter_copyMessage('${message.replace(/'/g, "\\'")}')">نسخ العرض</button>
+            <button class="btn-primary oil-copy-btn" type="button" data-copy-message="${escapeAttribute(message)}">نسخ العرض</button>
           </div>
         `;
       }).join('') : `
@@ -12857,47 +12863,11 @@ ${wash.services.map(s => `• ${s}`).join('\n')}
     function oilFilter_manualStep3() {
       oilFilter_currentStep = 'manualstep3';
       const contentArea = document.getElementById('contentArea');
-      const oils = oilFilter_stockData.filter(oil => oil.type === oilFilter_selectedViscosity && oil.contAvailable >= oilFilter_liters);
-
-      if (!oils.length) {
-        contentArea.innerHTML = `
-          <div class="form-section full-width" style="text-align:center; padding:24px; color:#ddd;">
-            <p>لا توجد ماركات متاحة للزيت ${escapeHtml(oilFilter_selectedViscosity)} والكمية ${oilFilter_liters} لتر.</p>
-            <button class="btn-primary" onclick="oilFilter_manualStep2()">رجوع</button>
-          </div>
-        `;
-        return;
-      }
-
       contentArea.innerHTML = `
         <div class="form-section full-width">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
-            <h3 class="section-title">الحاسبة اليدوية - خطوة 3: الماركة</h3>
+            <h3 class="section-title">الحاسبة اليدوية - خطوة 3: نوع الفلتر</h3>
             <button class="btn-back" onclick="oilFilter_manualStep2()">رجوع</button>
-          </div>
-          <div class="service-options">
-            ${oils.map((oil, index) => `<button class="btn-option" data-oil-index="${index}">${escapeHtml(oilFilter_translateBrand(oil.brand))}</button>`).join('')}
-          </div>
-        </div>
-      `;
-
-      document.querySelectorAll('[data-oil-index]').forEach(btn => {
-        btn.onclick = () => {
-          const index = parseInt(btn.dataset.oilIndex, 10);
-          oilFilter_selectedOil = oils[index];
-          oilFilter_manualStep4();
-        };
-      });
-    }
-
-    function oilFilter_manualStep4() {
-      oilFilter_currentStep = 'manualstep4';
-      const contentArea = document.getElementById('contentArea');
-      contentArea.innerHTML = `
-        <div class="form-section full-width">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
-            <h3 class="section-title">الحاسبة اليدوية - خطوة 4: نوع الفلتر</h3>
-            <button class="btn-back" onclick="oilFilter_manualStep3()">رجوع</button>
           </div>
           <div class="service-options">
             <button class="btn-option" data-filter="german">ألمانية (12 د.ك)</button>
@@ -12915,10 +12885,10 @@ ${wash.services.map(s => `• ${s}`).join('\n')}
         btn.onclick = () => {
           if (btn.dataset.filter === 'german') {
             oilFilter_filterPrice = 12;
-            oilFilter_showInvoice();
+            oilFilter_manualShowResults();
           } else if (btn.dataset.filter === 'other') {
             oilFilter_filterPrice = 8;
-            oilFilter_showInvoice();
+            oilFilter_manualShowResults();
           } else if (btn.dataset.filter === 'custom') {
             document.getElementById('customFilterPriceManual').classList.remove('hidden');
           }
@@ -12926,10 +12896,66 @@ ${wash.services.map(s => `• ${s}`).join('\n')}
       });
     }
 
+    function oilFilter_manualShowResults() {
+      oilFilter_currentStep = 'manualresults';
+      const contentArea = document.getElementById('contentArea');
+      const oils = oilFilter_stockData
+        .filter(oil => oil.type === oilFilter_selectedViscosity && oil.contAvailable >= oilFilter_liters)
+        .sort((a, b) => (a.effectivePriceLiter * oilFilter_liters) - (b.effectivePriceLiter * oilFilter_liters));
+
+      if (!oils.length) {
+        contentArea.innerHTML = `
+          <div class="form-section full-width" style="text-align:center; padding:24px; color:#ddd;">
+            <p>لا توجد زيوت متاحة لللزوجة ${escapeHtml(oilFilter_selectedViscosity)} والكمية ${oilFilter_liters} لتر.</p>
+            <button class="btn-primary" onclick="oilFilter_manualStep2()">رجوع</button>
+          </div>
+        `;
+        return;
+      }
+
+      const resultsHtml = oils.map(oil => {
+        const oilTotal = oil.effectivePriceLiter * oilFilter_liters;
+        const grandTotal = oilTotal + oilFilter_filterPrice + oilFilter_servicePrice;
+        const message = `متوفر زيت ${oilFilter_translateBrand(oil.brand)} (${oilFilter_liters} لتر) ودرجة اللزوجة ${oil.type}. السعر: ${grandTotal.toFixed(2)} د.ك. فلتر: ${oilFilter_filterPrice} د.ك. خدمة: ${oilFilter_servicePrice} د.ك.`;
+        return `
+          <div class="oil-card">
+            <div class="oil-card-header">
+              <h4>${escapeHtml(oilFilter_translateBrand(oil.brand))}</h4>
+              <span class="oil-price">${grandTotal.toFixed(2)} د.ك</span>
+            </div>
+            <div class="oil-card-details">
+              <p><strong>اللزوجة:</strong> ${escapeHtml(oil.type)}</p>
+              <p><strong>كمية السيارة:</strong> ${oilFilter_liters} لتر</p>
+              <p><strong>السعر للتر:</strong> ${oil.effectivePriceLiter.toFixed(2)} د.ك</p>
+              <p><strong>المتوفر:</strong> ${oil.contAvailable} لتر</p>
+            </div>
+            <button class="btn-primary oil-copy-btn" type="button" data-copy-message="${escapeAttribute(message)}">نسخ العرض</button>
+          </div>
+        `;
+      }).join('');
+
+      contentArea.innerHTML = `
+        <div class="form-section full-width">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px; flex-wrap:wrap;">
+            <div>
+              <h3 class="section-title">الزيوت المتاحة</h3>
+              <p style="color:#ccc; margin: 4px 0 0;">اللزوجة: ${escapeHtml(oilFilter_selectedViscosity)} — الفلتر: ${oilFilter_filterPrice} د.ك</p>
+            </div>
+            <button class="btn-back" onclick="oilFilter_manualStep3()">رجوع</button>
+          </div>
+          <div class="oil-results-grid">
+            ${resultsHtml}
+          </div>
+        </div>
+      `;
+
+      oilFilter_attachCopyButtons();
+    }
+
     function oilFilter_setCustomFilterManual() {
       const price = parseFloat(document.getElementById('customFilterInputManual').value) || 0;
       oilFilter_filterPrice = price;
-      oilFilter_showInvoice();
+      oilFilter_manualShowResults();
     }
 
     function oilFilter_showInvoice() {
@@ -12942,15 +12968,14 @@ ${wash.services.map(s => `• ${s}`).join('\n')}
       const oilTotal = effectivePriceLiter * liters;
       const total = oilTotal + oilFilter_filterPrice + oilFilter_servicePrice;
 
-      const message = `متوفر زيت ${oilFilter_translateBrand(oil.brand)} (${liters}) لتر ودرجة اللزوجة ${oil.type} مع الفلتر من الوكيل المعتمد مع فحص مجاني لمستوى غاز المكيف وإعادة برمجة علامة الخدمة جدام البيت بقيمة ${total.toFixed(2)} دك
-
-مناسب لسيارة: ${car ? oilFilter_getArabicCarName(car.carModel) : 'غير محدد'}`;
+      const message = `متوفر زيت ${oilFilter_translateBrand(oil.brand)} (${liters}) لتر ودرجة اللزوجة ${oil.type} مع الفلتر من الوكيل المعتمد مع فحص مجاني لمستوى غاز المكيف وإعادة برمجة علامة الخدمة جدام البيت بقيمة ${total.toFixed(2)} دك\n\nمناسب لسيارة: ${car ? oilFilter_getArabicCarName(car.carModel) : 'غير محدد'}`;
+      const backAction = car ? 'oilFilter_showResults()' : 'oilFilter_manualStep3()';
 
       contentArea.innerHTML = `
         <div class="form-section full-width">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
             <h3 class="section-title">الفاتورة النهائية</h3>
-            <button class="btn-back" onclick="${oilFilter_currentStep === 'results' ? 'oilFilter_showResults()' : 'oilFilter_manualStep4()'}">رجوع</button>
+            <button class="btn-back" onclick="${backAction}">رجوع</button>
           </div>
           <div class="invoice-details">
             <p><strong>الزيت:</strong> ${escapeHtml(oilFilter_translateBrand(oil.brand))} - ${escapeHtml(oil.type)}</p>
@@ -12960,38 +12985,50 @@ ${wash.services.map(s => `• ${s}`).join('\n')}
             <p><strong>الخدمة الميكانيكية:</strong> ${oilFilter_servicePrice} د.ك</p>
             <p><strong>الإجمالي:</strong> ${total.toFixed(2)} د.ك</p>
           </div>
-          <button class="btn-primary" onclick="oilFilter_copyMessage('${message.replace(/'/g, "\\'")}')">نسخ الرسالة</button>
+          <button class="btn-primary" type="button" data-copy-message="${escapeAttribute(message)}">نسخ الرسالة</button>
         </div>
       `;
+
+      oilFilter_attachCopyButtons();
     }
 
     function oilFilter_showMajorService(event, price) {
       event.stopPropagation();
+      const message = `خدمة التصفية العامة تشمل: تبديل بلاكات، تبديل فلتر هواء، تبديل فلتر مكيف، منظف دورة البانزين، بخاخ التصفية، تبديل زيت المكينة، تبديل فلتر الزيت، برمجة علامة الخدمة، فحص مستوى الزيوت والسوائل، فحص المساحات والتواير، فحص السفايف والديسكات. السعر: ${price} د.ك`;
       const modal = document.createElement('div');
       modal.className = 'modal-overlay';
       modal.innerHTML = `
-        <div class="modal-content">
-          <h4>التصفية العامة</h4>
-          <ul>
-            <li>تبديل بلاكات</li>
-            <li>تبديل فلتر هواء</li>
-            <li>تبديل فلتر مكيف</li>
-            <li>منظف دورة البانزين</li>
-            <li>بخاخ التصفية</li>
-            <li>تبديل زيت المكينة</li>
-            <li>تبديل فلتر الزيت</li>
-            <li>برمجة علامة الخدمة</li>
-            <li>فحص مستوى الزيوت والسوائل</li>
-            <li>فحص المساحات والتواير</li>
-            <li>فحص السفايف والديسكات</li>
-          </ul>
-          <p><strong>ملاحظة:</strong> جميع القطع أصلية معتمدة من الوكلاء الرسمية</p>
-          <p><strong>السعر:</strong> ${price} د.ك</p>
-          <button class="btn-primary" onclick="oilFilter_copyMajorServiceMessage(${price})">نسخ رسالة التصفية العامة</button>
-          <button class="btn-back" onclick="this.closest('.modal-overlay').remove()">إغلاق</button>
+        <div class="modal">
+          <button type="button" class="modal-close" aria-label="إغلاق">×</button>
+          <h3>التصفية العامة</h3>
+          <div class="modal-message" style="background:#111; border:1px solid #444; color:#eee; padding:14px; border-radius:10px; margin-top:10px;">
+            <ul style="padding-right:14px; margin:0 0 12px; list-style: none;">
+              <li>• تبديل بلاكات</li>
+              <li>• تبديل فلتر هواء</li>
+              <li>• تبديل فلتر مكيف</li>
+              <li>• منظف دورة البانزين</li>
+              <li>• بخاخ التصفية</li>
+              <li>• تبديل زيت المكينة</li>
+              <li>• تبديل فلتر الزيت</li>
+              <li>• برمجة علامة الخدمة</li>
+              <li>• فحص مستوى الزيوت والسوائل</li>
+              <li>• فحص المساحات والتواير</li>
+              <li>• فحص السفايف والديسكات</li>
+            </ul>
+            <p style="margin:0; font-weight:700; color:#F2BC1B;">السعر: ${price} د.ك</p>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn-primary" data-copy-message="${escapeAttribute(message)}">نسخ رسالة التصفية العامة</button>
+            <button type="button" class="btn-secondary" data-close-modal>إغلاق</button>
+          </div>
         </div>
       `;
       document.body.appendChild(modal);
+      modal.querySelector('.modal-close').onclick = () => modal.remove();
+      const closeBtn = modal.querySelector('[data-close-modal]');
+      if (closeBtn) closeBtn.onclick = () => modal.remove();
+      modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+      oilFilter_attachCopyButtons();
     }
 
     function oilFilter_copyMajorServiceMessage(price) {
@@ -13000,7 +13037,8 @@ ${wash.services.map(s => `• ${s}`).join('\n')}
     }
 
     function oilFilter_copyMessage(message) {
-      if (navigator.clipboard) {
+      if (!message) return;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(message).then(() => {
           oilFilter_showCopySuccess();
         }).catch(() => {
@@ -13009,6 +13047,24 @@ ${wash.services.map(s => `• ${s}`).join('\n')}
       } else {
         oilFilter_fallbackCopyTextToClipboard(message);
       }
+    }
+
+    function oilFilter_attachCopyButtons() {
+      document.querySelectorAll('[data-copy-message]').forEach(btn => {
+        if (btn.dataset.copyAttached) return;
+        btn.dataset.copyAttached = 'true';
+        btn.onclick = () => oilFilter_copyMessage(btn.dataset.copyMessage || '');
+      });
+    }
+
+    function escapeAttribute(value) {
+      return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\r/g, '')
+        .replace(/\n/g, '&#10;');
     }
 
     function oilFilter_showCopySuccess() {
@@ -13119,4 +13175,4 @@ ${wash.services.map(s => `• ${s}`).join('\n')}
     };
   </script>
 </body>
-</html>=
+</html>==
