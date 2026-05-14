@@ -552,14 +552,18 @@
     .btn-option {
       background: #2a2a2a;
       border: 1px solid #404040;
-      border-radius: 4px;
-      padding: 10px 8px;
+      border-radius: 6px;
+      padding: 14px 12px;
       cursor: pointer;
       transition: all 0.2s ease;
       text-align: center;
-      font-size: 13px;
+      font-size: 15px;
       color: #ccc;
       font-weight: 600;
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     
     .btn-option:hover {
@@ -1245,9 +1249,9 @@
 
     .service-options {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 12px;
-      margin-top: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
     }
 
     .invoice-details {
@@ -1280,6 +1284,7 @@
       padding: 10px;
       border-radius: 4px;
       cursor: pointer;
+      transition: background 0.2s ease, transform 0.1s ease;
     }
 
     .oil-copy-btn:hover {
@@ -1288,6 +1293,10 @@
 
     .oil-copy-btn.success {
       background: #16a34a;
+    }
+
+    .oil-copy-btn.failure {
+      background: #dc2626;
     }
 
     .driver-filters {
@@ -12795,11 +12804,7 @@ ${wash.services.map(s => `• ${s}`).join('\n')}
         <div class="form-section full-width">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px; flex-wrap:wrap;">
             <h3 class="section-title">الزيوت المتاحة لـ ${escapeHtml(car ? car.carModel : '')}</h3>
-            <div style="display:flex;gap:8px;">
-              <button class="btn-secondary" onclick="oilFilter_copyAllOils()">نسخ الكل</button>
-              <button class="btn-back" onclick="oilFilter_showCarList()">رجوع إلى القائمة</button>
-              <button class="btn-back" onclick="oilFilter_showFilterSelection()">رجوع</button>
-            </div>
+            <button class="btn-back" onclick="oilFilter_showFilterSelection()">رجوع</button>
           </div>
           <div class="oil-results-grid">
             ${resultsHtml}
@@ -12982,11 +12987,7 @@ ${wash.services.map(s => `• ${s}`).join('\n')}
               <h3 class="section-title">الزيوت المتاحة</h3>
               <p style="color:#ccc; margin: 4px 0 0;">اللزوجة: ${escapeHtml(oilFilter_selectedViscosity)} — الفلتر: ${oilFilter_filterPrice} د.ك</p>
             </div>
-            <div style="display:flex;gap:8px;">
-              <button class="btn-secondary" onclick="oilFilter_copyAllOilsManual()">نسخ الكل</button>
-              <button class="btn-back" onclick="renderOilFilterInterface()">رجوع إلى القائمة</button>
-              <button class="btn-back" onclick="oilFilter_manualStep3()">رجوع</button>
-            </div>
+            <button class="btn-back" onclick="renderOilFilterInterface()">رجوع إلى القائمة</button>
           </div>
           <div class="oil-results-grid">
             ${resultsHtml}
@@ -13101,14 +13102,42 @@ ${wash.services.map(s => `• ${s}`).join('\n')}
 
     function oilFilter_copyMessage(message, btn) {
       if (!message) return;
-      const finish = () => oilFilter_showCopySuccess(btn);
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(message).then(finish).catch(() => {
-          oilFilter_fallbackCopyTextToClipboard(message, btn);
+      const handleResult = (success) => oilFilter_showCopyStatus(btn, success);
+
+      const copyWithClipboard = () => {
+        return navigator.clipboard.writeText(message).then(() => true);
+      };
+
+      const copyWithFallback = () => {
+        return new Promise((resolve, reject) => {
+          const ta = document.createElement('textarea');
+          ta.value = message;
+          ta.setAttribute('readonly', '');
+          ta.style.position = 'absolute';
+          ta.style.left = '-9999px';
+          document.body.appendChild(ta);
+          ta.select();
+          ta.setSelectionRange(0, ta.value.length);
+          try {
+            const successful = document.execCommand('copy');
+            document.body.removeChild(ta);
+            if (successful) {
+              resolve(true);
+            } else {
+              reject(new Error('execCommand failed'));
+            }
+          } catch (e) {
+            document.body.removeChild(ta);
+            reject(e);
+          }
         });
-      } else {
-        oilFilter_fallbackCopyTextToClipboard(message, btn);
-      }
+      };
+
+      const copyPromise = (navigator.clipboard && navigator.clipboard.writeText)
+        ? copyWithClipboard().catch(() => copyWithFallback())
+        : copyWithFallback();
+
+      copyPromise.then(() => handleResult(true)).catch(() => handleResult(false));
     }
 
     function oilFilter_attachCopyButtons() {
@@ -13143,20 +13172,22 @@ ${wash.services.map(s => `• ${s}`).join('\n')}
       oilFilter_copyMessage(allMessages);
     }
 
-    function oilFilter_fallbackCopyTextToClipboard(text, btn) {
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      document.body.appendChild(ta);
-      ta.focus();
-      ta.select();
-      try {
-        document.execCommand('copy');
-        oilFilter_showCopySuccess(btn);
-      } catch (e) {
-        console.warn('Fallback copy failed', e);
-        alert('فشل في النسخ');
+    function oilFilter_showCopyStatus(btn, success) {
+      if (!btn) return;
+      const originalText = btn.textContent;
+      const originalClass = btn.className;
+      btn.classList.remove('success', 'failure');
+      if (success) {
+        btn.classList.add('success');
+        btn.textContent = 'تم النسخ!';
+      } else {
+        btn.classList.add('failure');
+        btn.textContent = 'فشل في النسخ';
       }
-      document.body.removeChild(ta);
+      setTimeout(() => {
+        btn.className = originalClass;
+        btn.textContent = originalText;
+      }, 2000);
     }
   </script>
   <script>
