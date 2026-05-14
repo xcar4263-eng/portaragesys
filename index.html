@@ -561,7 +561,6 @@
       color: #f3f3f3;
       font-weight: 700;
       min-height: 52px;
-      min-width: 160px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1245,17 +1244,13 @@
       color: #F2BC1B;
       font-size: 16px;
     }
-
-    .service-options {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 12px;
-      margin-top: 12px;
+      font-size: 14px;
+      color: #ccc;
     }
 
-    .oil-service-options {
-      display: grid;
-      grid-template-columns: repeat(5, minmax(140px, 1fr));
+    .service-options {
+      display: flex;
+      flex-wrap: wrap;
       gap: 10px;
       margin-top: 16px;
     }
@@ -12452,7 +12447,7 @@ ${wash.services.map(s => `• ${s}`).join('\n')}
       contentArea.innerHTML = `
         <div class="form-section full-width">
           <h3 class="section-title">زيت وفلتر</h3>
-          <div class="oil-service-options" style="display:flex;gap:10px;flex-wrap:nowrap;align-items:center;">
+          <div class="service-options">
             <button class="btn-option" data-action="carlist">قائمة السيارات</button>
             <button class="btn-option" data-action="manual">الحاسبة اليدوية</button>
             <button class="btn-option" data-action="admin">فتح لوحة التحكم (الشيت)</button>
@@ -12723,7 +12718,7 @@ ${wash.services.map(s => `• ${s}`).join('\n')}
             <h3 class="section-title">اختيار نوع الفلتر</h3>
             <button class="btn-back" onclick="oilFilter_showCarList()">رجوع</button>
           </div>
-          <div class="oil-service-options">
+          <div class="service-options">
             <button class="btn-option" data-filter="german">ألمانية (12 د.ك)</button>
             <button class="btn-option" data-filter="other">أمريكية/يابانية/كورية (8 د.ك)</button>
             <button class="btn-option" data-filter="custom">أخرى (أدخل السعر)</button>
@@ -12883,7 +12878,7 @@ ${wash.services.map(s => `• ${s}`).join('\n')}
             <h3 class="section-title">الحاسبة اليدوية - خطوة 2: اللزوجة</h3>
             <button class="btn-back" onclick="oilFilter_showManualCalculator()">رجوع إلى القائمة</button>
           </div>
-          <div class="oil-service-options">
+          <div class="service-options">
             ${viscosities.map(v => `<button class="btn-option" data-viscosity="${escapeHtml(v)}">${escapeHtml(v)}</button>`).join('')}
           </div>
         </div>
@@ -12906,7 +12901,7 @@ ${wash.services.map(s => `• ${s}`).join('\n')}
             <h3 class="section-title">الحاسبة اليدوية - خطوة 3: نوع الفلتر</h3>
             <button class="btn-back" onclick="oilFilter_showManualCalculator()">رجوع إلى القائمة</button>
           </div>
-          <div class="oil-service-options">
+          <div class="service-options">
             <button class="btn-option" data-filter="german">ألمانية (12 د.ك)</button>
             <button class="btn-option" data-filter="other">أمريكية/يابانية/كورية (8 د.ك)</button>
             <button class="btn-option" data-filter="custom">أخرى (أدخل السعر)</button>
