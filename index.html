@@ -561,6 +561,7 @@
       color: #f3f3f3;
       font-weight: 700;
       min-height: 52px;
+      min-width: 160px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1249,8 +1250,8 @@
     }
 
     .service-options {
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(140px, 1fr));
       gap: 10px;
       margin-top: 16px;
     }
